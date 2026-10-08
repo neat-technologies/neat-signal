@@ -17,6 +17,7 @@ We publish the reasoning and the evidence, not a highlight reel. Build-in-public
 | S-022 Live Thought-to-Steer runs ([#2](https://github.com/neat-technologies/neat-signal/issues/2)), **including failures** | Per run, as they complete | Repo logs + devlog + video | A receipt or an agent "OK" is not incorporation; queue-only is not mid-task success |
 | Benchmark arms + results (main design + A/B/C/D intent benchmark) | When a round completes | Devlog + repo | Report medians/p95, trial counts, missing data, negative results; no cherry-picked demo |
 | Two-agent contract-change demo (`token_id`→`session_id`) | When it reproduces on a verified runtime | Video + devlog | Show the control run; don't assert baseline always fails or Signal always wins |
+| A demo per shipped feature (purpose-built frontend + short video) | As each feature ships | Demo UI + video + devlog | Real, reproducible behaviour only; a mockup is labelled a mockup, never shown as working |
 
 Default: if a number hasn't been measured under a matched control, it doesn't get posted. If a capability isn't verified for a named runtime+version, we say "designed to," not "does."
 
@@ -27,7 +28,7 @@ Signal content rides the existing NEAT build-in-public cadence (bi-weekly; Deniz
 - **Public issue tracker** — the S-xxx issues are the backlog, in the open. Progress is legible from the issues and their linked evidence.
 - **Devlog posts** (neat.is blog + Dev.to) — one per meaningful milestone: a probed runtime, a Live Thought-to-Steer run (pass or fail), a benchmark round. The artifact, not the aspiration.
 - **X / LinkedIn threads** — the milestone in short form, linking the devlog. Founders' voice.
-- **Demo videos** — the two-agent contract-change scenario, with the control run shown. No staged success.
+- **A demo per feature** — every feature we ship gets a polished, purpose-built demo frontend (Jed) plus a short video, so each build-in-public drop is something you can *see*, not just read. The flagship is the two-agent contract-change scenario, with the control run shown. Demos show real, reproducible behaviour — a mockup is labelled a mockup; no staged success.
 
 Each post needs one concrete, true thing from the repo behind it. No cadence-filler.
 
@@ -75,4 +76,5 @@ Per NEAT's model: **software is free (FOSS + self-host); revenue is hosted/manag
 - **Deniz** — repo-public decision (gate); license choice (Apache-2.0); design-partner intros (≥5 concurrent-agent users).
 - **Sinan** — spec ownership; publish S-018 / S-022 results (incl. failures) as they land.
 - **Landing** — Signal hero (landing #34); a Signal page on neat.is.
-- **GTM** — devlog posts, X/LinkedIn threads, demo videos; run the cadence.
+- **Jed** — a polished, purpose-built demo frontend for each feature as it ships, so every build-in-public drop ships with a demo.
+- **GTM** — devlog posts, X/LinkedIn threads, the demo video per drop; run the cadence.
