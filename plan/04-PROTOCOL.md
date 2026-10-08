@@ -56,10 +56,16 @@ Minimum event types:
 | `agent.reasoning.trace` | explicitly provider-exposed trace | Disabled by default |
 | `agent.assistant.output.delta` | visible assistant text delta | Ephemeral by default |
 | `agent.tool.intent` | provider-exposed pending tool action | Ephemeral; never assumed to be a safe checkpoint |
+| `agent.tool.pending` | verified pre-tool request, paths/patch hash and hook capability | Durable redacted metadata; requested, not completed |
 | `agent.stream.gap` | source discontinuity, dropped count, replay limit | Durable metadata |
 | `agent.usage.updated` | measured tokens, model identifier, source | Durable aggregated |
 | `signal.message.*` | lifecycle transitions | Durable |
 | `signal.intervention.*` | reason, policy decision and result | Durable |
+| `signal.ownership.lease.*` | grant/renew/expire/revoke with task and scope | Durable |
+| `signal.ownership.conflict` | current lease versus observed pending action | Durable |
+| `signal.impact.graph_inferred` | graph-derived potential cross-task impact | Durable |
+| `signal.intent.forecast.*` | candidate/expire/supersede/outcome with source refs | Durable redacted metadata |
+| `signal.intent.model_predicted_conflict` | uncertain predicted collision | Durable; no control authority |
 
 **Do not fabricate** missing counters, raw thoughts, plan text or token pricing. `source` must distinguish provider, tool, agent self-report and inference. Track `confidence` for inferred state.
 
@@ -100,6 +106,83 @@ type LiveObservationData = {
 ### Active-session observation capability
 
 Probe each session, not just its provider. For each of `reasoning_content`, `reasoning_summary_stream`, `visible_output_deltas`, `usage_update_granularity`, `tool_event_granularity`, `live_steer`, `interrupt`, `resume`, and `attach_to_existing`, record `verified | unsupported | unverified`, runtime and adapter versions, test date, evidence reference, and any fallback. `unverified` must not be displayed as `unsupported`; a provider-wide claim must not override a weaker active-session probe.
+
+Extend the probe with `pre_tool_request`, `pre_tool_pause`, `owner_wakeup`, `session_resume` and whether a pending patch/path is exposed before execution. A start/end event does not imply a cancellable pre-tool boundary. Each result needs its own exact-version executable evidence and fallback.
+
+## Forecast and ownership contracts (proposed v1)
+
+These are Signal schema proposals, **not existing NEAT exports**. Implement each as Zod schema plus inferred TypeScript type; keep the outer `EventEnvelope` v1 identity, scope, ordering and audit trail. A persisted schema change requires a migration and replay compatibility test.
+
+```ts
+type PredictionSource =
+  | 'pending_tool_call' | 'provider_reasoning_summary'
+  | 'provider_exposed_reasoning_trace' | 'agent_declared_plan'
+  | 'assistant_output' | 'execution_pattern' | 'model_inference'
+  | 'deterministic_rule';
+type ForecastedAction = 'edit_file' | 'change_symbol_or_contract'
+  | 'invoke_tool' | 'modify_dependency' | 'execute_command' | 'unknown';
+
+type PendingToolRequest = {
+  schema_version: 1; request_id: string; source_event_id: string;
+  hook_capability_ref: string; session_id: string; turn_id: string;
+  repo_scope: { repo_id: string; worktree_id: string;
+    base_commit: string; working_revision: number };
+  requested_at: string; tool_name: string;
+  target_paths: string[]; patch_hash?: string; command_digest?: string;
+  state: 'requested' | 'released' | 'cancelled' | 'timed_out' | 'executed' | 'unknown';
+};
+
+type AgentIntentForecast = {
+  schema_version: 1;
+  forecast_id: string;
+  workspace_id: string;
+  agent_id: string;
+  session_id: string;
+  turn_id: string | null;
+  stream_epoch: number;
+  repo_scope: { repo_id: string; worktree_id: string;
+    base_commit: string; working_revision: number };
+  context_version: string;
+  created_at: string;
+  expires_at: string;
+  horizon: 'pending_tool' | 'near_future_task';
+  predicted_action: ForecastedAction;
+  target_paths?: string[];
+  target_symbols?: string[];
+  concise_rationale: string; // Redacted evidence digest, never private reasoning.
+  input_event_ids: string[];
+  source_kinds: PredictionSource[];
+  neat_graph_ref?: string;
+  neat_dependency_evidence_refs: string[];
+  neat_runtime_evidence_refs: string[];
+  pending_action_directly_observed: boolean;
+  intent_confidence?: number; // Omit until calibrated for this horizon/source.
+  evidence_quality: 'verified' | 'mixed' | 'weak' | 'unknown';
+  conflicting_agent_ids: string[];
+  suggested_action: 'observe' | 'notify' | 'wake' | 'propose_steer' | 'checkpoint';
+  status: 'active' | 'expired' | 'superseded' | 'confirmed' | 'disconfirmed' | 'unknown';
+  intervention_id?: string;
+  outcome_event_ids?: string[];
+};
+
+type TaskOwnershipLease = {
+  schema_version: 1; lease_id: string; workspace_id: string;
+  owner_agent_id: string; owner_session_id: string | null; task_id: string;
+  repo_scope: { repo_id: string; worktree_id: string;
+    base_commit: string; working_revision: number };
+  context_version: string;
+  resource_kind: 'file' | 'symbol' | 'contract' | 'dependency_subgraph';
+  resource_refs: string[]; acquired_at: string; expires_at: string;
+  status: 'active' | 'expired' | 'released' | 'revoked';
+  advisory: true; authority_event_id: string;
+};
+```
+
+The `pending_tool` invariant requires a verified pre-tool event ID and `pending_action_directly_observed: true`; a plan or summary alone can only produce `near_future_task`. A pending request proves a requested action, not a completed edit; `agent.file.changed` needs an independently verified hash/diff. Keep **intent confidence, graph provenance strength, runtime coverage and impact severity separate**. Never derive a numerical intent probability from prose confidence or NEAT edge confidence. `INFERRED`, `STALE` and `FRONTIER` edges cannot alone authorise a blocker.
+
+`PendingToolRequest` metadata must refer to the exact adapter/hook capability finding. The command digest and patch hash avoid persisting sensitive payloads by default. A timeout never silently becomes `executed`; execution needs a later tool/file observation with its own event ID. Ownership grant/renew/expire/release and forecast candidate/expire/supersede/outcome transitions each use versioned `EventEnvelope.data` and append-only journal events.
+
+Deduplicate by session/turn/horizon/action/target/context and related evidence; set bounded TTL. Supersede or cancel on changed turn, stream epoch, worktree revision, context version, lease, direct contradictory action or capability. Revalidate before dispatch, and never replay an older candidate as current after reconnect. Journal links from forecast to intervention and later observed outcome without overwriting the original forecast.
 
 ## RoutedMessage v1
 
@@ -151,7 +234,7 @@ Messaging remains durable even when live steering is impossible. Its receipt and
   "target_session_id": "sess_42",
   "action": "steer_now",
   "severity": "medium",
-  "confidence": 0.92,
+  "evidence_quality": "verified",
   "evidence": [{"kind": "neat_dependency", "ref": "graph:edge:123", "scope": "wt_b"}],
   "requested_at": "2026-10-08T09:30:15.000Z",
   "approval": "auto_low_risk",
@@ -159,7 +242,7 @@ Messaging remains durable even when live steering is impossible. Its receipt and
 }
 ```
 
-Thresholds and numeric confidence are *internal heuristics* to be calibrated. `confidence` is not a guarantee of correctness and must not be conflated with NEAT's graph confidence.
+Numeric intent probability is omitted until calibrated on observed action labels. Evidence quality, NEAT edge provenance and impact severity remain separate; none grants intervention permission.
 
 ### Fast control request and outcome
 

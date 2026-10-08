@@ -16,6 +16,7 @@ Tasks:
 - Test native active-turn steer, interrupt-and-continue, managed pre-tool checkpoint feasibility, next-turn queue and observe-only separately. Prove whether a correction changes an active run, not merely whether an API accepts it.
 - Prototype NEAT dependency query for two files in a fixture repository.
 - Record unknowns explicitly; do not fill gaps with guesses.
+- Probe pre-tool request visibility versus actual pre-tool pause, owner wakeup/resume, dirty-worktree overlay support and source-attributed application OTel coverage as separate `UNVERIFIED` cells until executable evidence exists. Audit NEAT commit `55bb110` findings in [the boundary chapter](02-EXISTING-NEAT-BOUNDARY.md) against the commit chosen for implementation; resolve ADR-SIG-003 before using graph evidence for automatic checkpoints.
 
 **Gate:** one reproducible authorised provider event stream plus one reproducible NEAT impact query, a versioned capability matrix, and a controlled live-steer/interrupt feasibility result. No hidden assumptions. Record an ADR for any checkout/interface contradiction.
 
@@ -45,11 +46,15 @@ Materialize agent state, file activity, context version, worktree scope, NEAT re
 
 **Gate:** two running agents in different worktrees; contract change causes a *supported* impact finding with exact dependency evidence; irrelevant agents remain unaffected.
 
+Add a worktree revision/overlay strategy, runtime coverage and source-attribution ledger, and advisory Task Ownership Leases before predictive control. A stale overlay or unattributed OTel span remains visible but cannot be promoted to a current file-level blocker. Prove a four-file lease conflict and a cross-worktree semantic contract conflict with independent diff/graph evidence.
+
 ## Phase 4 — Controlled interventions
 
 Implement intervention policy, Observe/Assist/Guard modes, approval flow, dedupe, version/turn preflight, adapter delivery and distinct `runtime_accepted`, `incorporated_by_agent` and `effect_verified` states. Add an optional, explicitly authorised pre-tool checkpoint only for Signal-managed sessions with a verified safe hook. Default Observe.
 
 **Gate:** intervention is delivered only to matching active turn and current scope; no `incorporated_by_agent` without same-task evidence or `effect_verified` without independent evidence; queue-only delivery never counts as mid-task success; negative tests pass.
+
+PAIE first emits `pending_tool` candidates from verified hooks and `near_future_task` candidates from deterministic rules. The Intervention Engine handles owner wakeups, deduplication and bounded fallback. Only after the rules-only arm is stable may opt-in reasoning-assisted inference run under a latency/token budget. A model forecast alone stays Observe/notify; checkpoint tests require a real pending request, explicit policy, and supported hook. Outcome scoring records confirmations, disconfirmations, false alarms and lateness.
 
 ## Phase 5 — Claude adapter and dashboard
 
@@ -88,8 +93,18 @@ Run matched experiment baseline vs Signal on small multi-agent coding tasks. Rec
 | S-021 (P0) | Content consent, redaction, stream isolation and operator kill switch | S-019, S-020 |
 | S-022 (P0) | Controlled Live Thought-to-Steer research fixture, minimal NEAT query prototype and feasibility report | S-001, S-018 |
 | S-023 | Integrated `t0`–`t7` telemetry, incorporation/effect verifier and repeatable fixture | S-014, S-019, S-020, S-021, S-022 |
+| S-024 (P0) | Pre-tool, wakeup/resume, OTel source-coverage and dirty-worktree capability probes; resolve ADR-SIG-003 | S-001, S-018 |
+| S-025 | Versioned forecast/lease/event schemas, migration and replay | S-002, S-024 |
+| S-026 | Revision-matched worktree overlay and NEAT runtime-evidence coverage bridge | S-010, S-024 |
+| S-027 | Advisory Task Ownership Leases and deterministic pre-edit owner wakeup | S-004, S-009, S-025, S-026 |
+| S-028 | Independent PAIE deterministic candidates, two horizons, dedupe/expiry and outcome links | S-009, S-025, S-026, S-027 |
+| S-029 | Optional, consented reasoning-assisted inference with budget and calibration | S-019, S-021, S-028 |
+| S-030 | Forecast-aware Intervention Engine policy, checkpoint preflight and bounded owner fallback | S-012, S-020, S-027, S-028 |
+| S-031 | Agent Intent Prediction Benchmark, matched A/B/C/D arms and Guard gate report | S-023, S-029, S-030 |
 
 Schedule S-018/S-022 before adapter claims, S-019/S-020/S-021 before automatic intervention, and S-023 before dashboard polish, second-provider expansion or Guard. S-022 may use a controlled prototype without claiming the production LRI/control path exists. Existing IDs are retained for traceability; their dependencies must be updated when issues are actually filed.
+
+For PAIE, resolve S-024 first; build S-025/S-026 before S-027; establish deterministic S-027/S-028 and baseline arm B before S-029; integrate policy S-030; run S-031 before autonomous Guard. These are proposed tasks, not implementation claims.
 
 ### Acceptance for the new work items
 
@@ -99,6 +114,14 @@ Schedule S-018/S-022 before adapter claims, S-019/S-020/S-021 before automatic i
 - **S-021 — security:** cross-workspace/content denial, consent revocation, prompt-injection resistance, short retention and operator kill-switch tests pass; already-running tool limits are visible.
 - **S-022 — research fixture:** a controlled long task records real available stream classes and a correction before completion, compares queue-only delivery, and reports unsupported cells and negative outcomes honestly.
 - **S-023 — integrated proof:** the production pipeline records `t0`–`t7` where observable, verifies same-task incorporation plus an independent changed action, and reports median/p95 detection-to-incorporation/effect without inventing token precision.
+- **S-024 — capability/ADR:** exact runtime and NEAT versions, test date, native events and fixture prove or reject each pre-tool/pause/resume/coverage/overlay capability. A mismatch has an ADR with options and an Observe fallback.
+- **S-025 — contracts:** Zod types validate source-labelled `pending_tool` versus `near_future_task`, lease scope, TTL, supersession, intervention links and old-envelope replay; a stale forecast cannot regain active status after reconnect.
+- **S-026 — graph join:** static `EXTRACTED` path carries snapshot/overlay revision; `OBSERVED` OTel path carries environment, attribution and sampling coverage. Dirty or unattributed fixtures suppress automatic control.
+- **S-027 — ownership/wakeup:** a four-file task lease wakes the correct owner on an incompatible pending edit, ignores a compatible same-file edit, and degrades truthfully when owner is offline; a semantic cross-file lease finds a fresh dependency path.
+- **S-028 — PAIE:** deterministic candidate precedes a targeted action in one fixture; pending request is never reported as completed; context change expires forecast; outcome labels and intervention IDs are journal-linked.
+- **S-029 — inference:** opt-out, source labels, token/latency budget and no-content fallback pass; calibrated probability is omitted until sufficient action labels exist.
+- **S-030 — policy:** weak forecasts cannot activate Guard or pause tools; verified pending conflict can checkpoint only under an authorised current hook; a timing race cancels stale dispatch; wakeup storms are bounded.
+- **S-031 — benchmark:** repeat matched arms A/B/C/D, report precision/recall, lead time, pre-action catch rate, false wakeups, verified outcomes, overhead and negative findings; no Guard graduation without measured improvement over rules-only B.
 
 ## Open technical unknowns to resolve in Phase 0
 
@@ -106,6 +129,8 @@ Schedule S-018/S-022 before adapter claims, S-019/S-020/S-021 before automatic i
 - Does a native control request change an active run's later action before task completion, or only queue a new turn? Test receipt and independent effect separately.
 - Can the chosen runtime safely pause before a consequential tool action, and can an independently running session be attached through a supported interface? If not, use owned sessions or a queue/observe fallback.
 - Can the actual NEAT query surface identify the correct dependency at a dirty worktree revision? If not, label an approximation and propose a bridge/overlay ADR before automatic intervention.
+- Can an exact selected runtime expose a pending request before execution, pause it safely, wake the leased owner and resume the same task? Each is independently `UNVERIFIED` until probed.
+- Does application OTel cover the relevant service/environment and carry a usable source map? Missing spans and source attributes cannot be treated as absence of dependency.
 - Which token and source timestamps are actually exposed and clock-comparable? Report unknown overhead rather than invented precision.
 
 ## Definition of done for every issue

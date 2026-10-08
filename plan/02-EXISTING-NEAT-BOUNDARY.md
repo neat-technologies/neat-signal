@@ -15,7 +15,9 @@ The repository documentation describes:
 - NEAT REST and MCP interfaces for dependencies, blast radius, policy checks, graph diffs, and related queries.
 - Provenance categories including `EXTRACTED`, `OBSERVED`, `INFERRED`, `STALE`; the checked source also defines `FRONTIER`, which is not a settled dependency for impact traversal.
 
-**Checked source, not runtime proof:** the local NEAT checkout at `2b90e405` contains `packages/types/src/constants.ts` and `edges.ts` with a `FRONTIER` provenance value in addition to the four settled/aging values above; `packages/core/src/api.ts` defines node, dependency, blast-radius and diff routes; and `packages/types/src/mcp-tools.ts` lists the MCP tools. These source observations do not verify a running endpoint, branch-aware query, tenant isolation or Signal integration. Re-audit the commit selected for implementation.
+**Earlier source audit, not runtime proof:** the previous specification recorded NEAT commit `2b90e405` with `FRONTIER` provenance, graph routes and MCP tools. Those observations did not verify a running endpoint, branch-aware query, tenant isolation or Signal integration. Re-audit the commit selected for implementation.
+
+**Fresh source audit for this specification update (2026-10-08):** a temporary official NEAT checkout at `55bb110` was inspected, including `CLAUDE.md`, `CONTRIBUTING.md`, `docs/contracts.md`, `docs/architecture.md`, `docs/api-reference.md`, `packages/core/src/api.ts`, and `packages/types/src/constants.ts`. Source defines `/graph/dependencies/:nodeId`, `/graph/observed-dependencies/:nodeId`, blast-radius and graph-diff routes; `IMPORTS` is a static file relationship and `OBSERVED` edges originate from application OTel when instrumented. `FRONTIER` is excluded from settled traversal. This was a source read, not a running API or coverage test. Source-attributed spans require actual `code.*` attribution and project instrumentation; absent spans cannot prove a relationship unused. The checkout does not establish a Signal-owned coding-agent event stream or a revision-matched dirty-worktree graph query.
 
 ## Hard integration rules
 
@@ -28,6 +30,8 @@ The repository documentation describes:
 7. Ensure NEAT works unchanged when Signal is not installed, connected, or enabled.
 8. Before using a dependency or policy result to intervene, record the NEAT daemon/project, graph snapshot or extraction revision, node identity, edge provenance and confidence, and the target worktree's base commit plus dirty revision. Revalidate immediately before dispatch. If the graph cannot represent that scope, return `unsupported_scope` or a labelled approximation and stay in Observe/Assist.
 9. The Live Reasoning Interface, provider event adapters, fast steering lane and verification journal are **new Signal work**. Existing NEAT graph and MCP/REST queries do not imply any live agent observation or steering capability.
+10. PAIE, coding-agent pre-tool/file instrumentation, task ownership leases and worktree overlays are **new Signal work**. Application OTel records application execution, not agent reasoning, token text or edits. Keep agent-runtime event provenance distinct even if both ultimately use OTel envelopes.
+11. Treat static `EXTRACTED` import and source-dependency edges, extracted symbol/contract facts where supported, runtime `OBSERVED` calls, and `INFERRED`/`STALE`/`FRONTIER` leads differently. The audited source defines `IMPORTS`; it does not justify assuming a general `EXPORTS` edge. A runtime edge needs environment, sampling/coverage and source-attribution metadata; a static edge needs graph revision and overlay freshness. No single edge class proves the forecasted action.
 
 ## Proposed package layout (NOT an assertion about existing files)
 
@@ -42,6 +46,8 @@ packages/
       adapters/       # provider-specific process/session bridges
       lri/            # authorised live deltas + ephemeral projection
       state/          # agent state projection + evidence
+      intent/         # PAIE candidates, grounding, calibration
+      ownership/      # advisory task leases and owner wakeup
       neat/           # typed NEAT graph query bridge
       intervene/      # detection, policy, steering orchestration
       control/        # bounded high-priority steering lane
@@ -87,5 +93,6 @@ As of this document's creation, **none of Signal's new components is asserted to
 
 - **ADR-SIG-001 — Graph scope for dirty worktrees.** The proposed `RepoScope` needs branch/base/dirty-revision accuracy, but the routes observed in `packages/core/src/api.ts` do not by themselves prove that per-worktree overlays exist. Decide whether to build an overlay, re-extract the worktree, or return `unsupported_scope`; automatic intervention must fail closed until a matching graph revision is verified.
 - **ADR-SIG-002 — Provenance mapping.** Earlier four-state summaries omit `FRONTIER` present in the checked `@neat.is/types` source. Define how Signal displays it and exclude it from settled dependency proof, following NEAT's current traversal contract. Keep agent-observation provenance in a separate namespace.
+- **ADR-SIG-003 — Revision and runtime evidence bridge.** At audited NEAT commit `55bb110`, the existing graph routes expose project/node traversal, while this spec needs a forecast grounded in an exact worktree revision and source-attributed OTel coverage. Options: (A) build a Signal overlay/re-extraction adapter and coverage ledger; (B) propose a compatible NEAT API extension after source tests; (C) return `unsupported_scope` and limit action to human-reviewed Observe/Assist. Choose after a dirty-worktree and OTel fixture probe. Until then, no automatic checkpoint may rely on the presumed join.
 
 These are proposed decisions, not assertions that the current checkout implements the bridge. Verify against the implementation commit before coding.

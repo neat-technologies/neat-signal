@@ -17,6 +17,12 @@ flowchart TD
   C --> D[Live subscriptions and replay]
   C --> E[State projector]
   P --> E
+  E --> O[Task ownership lease registry]
+  E --> Q[Predictive Agent Intent Engine]
+  G --> Q
+  O --> Q
+  Q --> C
+  Q --> F
   E --> F[Relevance and conflict detector]
   G[NEAT graph query bridge] --> F
   F --> H[Intervention policy engine]
@@ -60,6 +66,16 @@ A materialized projection: agent/task/turn, active tool, touched files, observab
 ### 6. NEAT Bridge
 
 Resolving touched or intended files into graph nodes; retrieving impacted dependents and applicable policies; returning versioned, evidence-backed findings. Strict separation of NEAT graph claims and agent intent inference.
+
+The bridge exposes source snapshot and worktree-overlay identity, plus application OTel evidence only when real spans have source attribution and coverage metadata. Agent pre-tool/file events arrive through the adapters and LRI, not through application OTel.
+
+### 6a. Predictive Agent Intent Engine (PAIE) and ownership
+
+PAIE is an independent consumer of State Mirror projections and immutable `EventEnvelope` references. Its stages are acquisition with source availability/lag, temporal projection, deterministic candidate generation, optional budgeted inference, NEAT impact grounding, evidence evaluation, cross-agent relevance, decision handoff and outcome scoring. It publishes versioned forecast candidates into the **existing** journal. The Intervention Engine alone authorises and dispatches control. Do not add a second event bus.
+
+Two horizons have different authority: `pending_tool` is directly observed pending action from a verified hook and can support a policy-gated checkpoint; `near_future_task` is a probabilistic or heuristic forecast before a tool request and defaults to Observe/notify. Task Ownership Leases are advisory, scoped to repository/worktree/task and files, symbols, contracts or subgraphs. Expiry, task end and revision/context changes invalidate them. A relevant conflict may wake an idle owner once with a bounded digest; the owner is not kept generating in the background.
+
+Measure separately event-to-forecast, forecast-to-grounding/authorisation, authorisation-to-runtime acceptance/incorporation, and incorporation-to-verified effect. Record lead time to the eventual targeted tool/edit. Deterministic detection runs first; optional inference runs only for relevant or high-impact candidates under opt-out, latency and token budgets. Stale graph, missing OTel, missing source map or unsupported steer yields an explicit degraded result.
 
 ### 7. Intervention Controller
 

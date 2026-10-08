@@ -30,6 +30,8 @@ The publicly documented NEAT repository describes a graph built from static sour
 | Live stream | Publish relevant changes to agents and dashboard subscribers | Yes |
 | Provider adapters | Launch/attach where supported; probe actual capabilities; steer/interrupt | Yes |
 | Agent State Mirror | Evidence-backed view of each running agent's current work | Yes |
+| Predictive Agent Intent Engine (PAIE) | Forecast next observable actions, ground impact and score outcomes without granting control authority | Yes |
+| Task Ownership Leases | Advisory file, symbol, contract and subgraph ownership with reactive owner wakeup | Yes |
 | NEAT impact bridge | Resolve files/contracts/dependencies against the NEAT graph | Yes (integrates existing NEAT) |
 | Intervention engine | Evaluate conflicts, policy, authority, and safe delivery timing | Yes |
 | Control dashboard | Show activity, conflicts, delivery states, decisions and overrides | Yes |
@@ -55,6 +57,8 @@ The publicly documented NEAT repository describes a graph built from static sour
 Agent A changes a backend interface. Agent B is concurrently building frontend code against the prior contract. Signal identifies the affected dependency through NEAT, verifies that B is operating on outdated contract context, sends a scoped correction into B's active turn if supported, records the native receipt separately, and confirms B's next observable implementation matches the new contract **before the task ends**. A control run without Signal shows whether correction latency and rework actually improve.
 
 The P0 **Live Thought-to-Steer** experiment repeats this in a controlled, long-running task. It compares available output/tool streams, provider-exposed summaries or traces where supported, active-turn steering, interrupt-and-continue, and next-turn queueing. It must show incorporation before task completion for at least one verified runtime; unsupported cells stay visibly unsupported.
+
+The separate **Agent Intent Prediction Benchmark** compares deterministic owner checks, authorised live-stream forecasts, and NEAT source/runtime grounding on matched tasks. Its pending-tool and near-future horizons stay distinct; a forecast never proves an edit occurred. See [validation](11-VALIDATION-AND-GTM.md#agent-intent-prediction-benchmark).
 
 ## Non-goals for V0
 

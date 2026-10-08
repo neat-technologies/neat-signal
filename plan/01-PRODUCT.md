@@ -45,6 +45,10 @@ The defining problem is an active Agent B continuing a long task under an outdat
 
 **US-8 — Live correction:** During a long-running task, an authorised observer detects a stale assumption from available output, tool activity or provider-exposed reasoning, then sees whether B incorporates a scoped correction before completion. Native active-turn steer is preferred where verified; interrupt-and-continue, an approved pre-tool checkpoint, next-turn queue and observe-only are reported as distinct outcomes.
 
+**US-9 — Predictive warning:** Before B issues an edit request, a fresh, source-labelled forecast indicates B may change an API contract that A owns. I can see the predicted action, evidence, uncertainty, affected dependency and time remaining; a weak forecast only informs me.
+
+**US-10 — Reactive owner wakeup:** A can register a short-lived advisory lease on files or a contract. When B's observed pending edit or well-grounded forecast may conflict, Signal wakes A with a concise evidence digest if the risk warrants it. An idle A consumes no standing model budget; if A cannot resume, Signal reports a bounded fallback.
+
 Candidate situations include an emitted plan to remove an API field still used by another service, a pending tool edit to a dependency another agent just changed, a requirement superseded during a long task, and a dirty worktree newer than NEAT's analysed revision. In each case, observed text or tool intent is only a signal; the current diff and graph scope must support the conflict, and a later action/test must verify the correction. [The state and NEAT chapter](06-AGENT-STATE-AND-NEAT.md#reasoning-aware-examples-to-test) separates observation, inference, control and verification for each case.
 
 ## Proposed product modes
@@ -68,6 +72,8 @@ NEAT has static `EXTRACTED`, runtime `OBSERVED`, computed `INFERRED`, and aging 
 
 All are hypotheses until controlled measurements support them.
 
+Predictive value is the **lead time before the targeted observable action**, the share of risky actions caught before execution, and fewer verified incompatibilities per completed task at acceptable wakeup, interruption, latency and token costs. Compare PAIE against rules-only coordination on matched tasks; do not infer value from forecast volume.
+
 ## Success criteria for a private alpha
 
 - A demonstrable two-agent contract-change intervention, with video/log replay.
@@ -82,5 +88,7 @@ All are hypotheses until controlled measurements support them.
 ## Explicitly out of scope
 
 General employee chat; non-coding workflow orchestration; obtaining provider-hidden model thoughts; perfect intent inference; self-modifying security rules; unattended privileged shell commands.
+
+PAIE does not predict exact future tokens, treat a provider summary as hidden thought, or grant automatic control from model confidence. A predicted conflict is not an observed edit. The immediate pending-tool horizon records an actual request at a supported boundary; the near-future task horizon remains an uncertain forecast. Ownership leases are advisory and never override the user's instruction.
 
 Reasoning traces expressly returned by an authorised provider or open-weight runtime are research inputs, not private hidden chain-of-thought. A trace, a summary, visible output, token counts and inferred intent are different signals. None alone proves the agent's next action, and Signal cannot inject guidance into an inaccessible mid-token computation.

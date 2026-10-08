@@ -36,7 +36,8 @@ type AdapterCapabilities = {
   findings: Record<
     'reasoning_content' | 'reasoning_summary_stream' | 'visible_output_deltas' |
     'usage_update_granularity' | 'tool_event_granularity' | 'live_steer' |
-    'interrupt' | 'resume' | 'attach_to_existing',
+    'interrupt' | 'resume' | 'attach_to_existing' | 'pre_tool_request' |
+    'pre_tool_pause' | 'owner_wakeup' | 'session_resume',
     CapabilityFinding
   >;
 };
@@ -67,6 +68,8 @@ The booleans and mode lists above are **effective verified capabilities only**. 
 | Generic IDE/CLI agent | UNVERIFIED | UNVERIFIED | UNVERIFIED | UNVERIFIED | UNVERIFIED | UNVERIFIED | UNVERIFIED | UNVERIFIED | UNVERIFIED |
 
 Fallback while unverified: use only explicitly authorised Observe or durable next-turn queue where a live probe proves that queue path; otherwise report `observe_only`. Do not treat a visible “Thinking” panel, token counts or API marketing text as evidence of reasoning content or mid-task steering.
+
+**PAIE probe extension:** for the same exact runtime build, separately test pre-tool request visibility (paths/patch/command and timestamp), ability to pause *before* tool execution, file-change confirmation, wakeup of an idle owned session, and resume of that exact session/turn. All are **UNVERIFIED** in this documentation update; the current runtime matrix above does not establish them. Record `verified | unsupported | unverified`, version, test date, native event/receipt IDs, latency and fallback per cell. A provider summary or a tool-start event cannot be relabelled as a pre-tool interception point.
 
 For each category, run a controlled long task and capture native event IDs, timestamps, stream ordering and loss, then submit a correction before completion and inspect subsequent actions. Compare five distinct strategies: native active-response steer, interrupt-and-continue, an authorised Signal-managed pre-tool checkpoint, next-turn queue, and observe-only. A tool hook is not a way to edit hidden inference. Repeat after a target-turn race and after a dropped stream; publish negative results.
 
@@ -147,6 +150,11 @@ OpenCode, Gemini CLI, Cursor, local-model runtimes. Prioritize by verified sessi
 | Stream gap/backpressure | explicit gap and dropped count; control lane remains responsive |
 | Reasoning classes | summary, trace, output, counts and inferred intent remain distinct |
 | Same-task correction | incorporation and independent changed effect recorded before task end, or accurate fallback |
+| Pending action | request event precedes execution; path/patch provenance and cancellation semantics are accurate |
+| Owner wakeup | only a currently leased, permitted session resumes; offline/unsupported owner gets bounded fallback |
+| Forecast race | turn/revision change supersedes candidate before checkpoint or steer |
+
+For PAIE, owned sessions are the first integration target. A Signal-owned pre-edit hook must emit the requested operation before executing it, with a stable request ID and explicit accept/reject/timeout result. Verify that a paused request cannot leak through on timeout, and state the adapter's fail-open/fail-closed policy. File watcher observations after an edit support outcome verification, not pre-edit blocking. Reasoning summaries and plans can improve an earlier *near-future* forecast, but no adapter may claim it read private thoughts. Application OTel remains a separate NEAT data source and cannot stand in for any coding-agent hook.
 
 ## Deliverability modes shown in UI
 

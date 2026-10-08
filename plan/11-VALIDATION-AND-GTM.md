@@ -65,6 +65,25 @@ Use fixtures for four conflict types: a proposed API-field removal with a verifi
 
 No benchmark may count `runtime_accepted`, an agent's “OK”, or a queue-only delivery as verified incorporation. Do not infer token-by-token waste from end-of-turn aggregates or promise a millisecond SLA before measurement.
 
+## Agent Intent Prediction Benchmark
+
+This benchmark evaluates **next observable action** forecasts, not hidden reasoning. Replayable fixtures and live-provider integration trials use matched tasks, repeated runs, the same versions/budgets and independently checked outcomes. Publish trial counts, missing data and negative results.
+
+| Arm | Capability |
+|---|---|
+| A | Uncoordinated agents |
+| B | Signal deterministic file/contract checks and owner wakeups; no reasoning predictor |
+| C | B plus authorised summaries/output and PAIE near-future forecasts |
+| D | C plus NEAT static graph and real source-attributed application OTel evidence where covered |
+
+Compare B–C to isolate the value of published stream inference and C–D to isolate graph/runtime evidence; also compare static-only grounding with static plus OTel. Do not assume D wins. Keep existing Live Thought-to-Steer and delivery-mode experiments; they answer a related timing/control question.
+
+**Required fixtures:** (1) B requests an edit to one of A's four leased task files, including owner-offline fallback; (2) a cross-file, cross-worktree API contract conflict; (3) a runtime-only relationship with genuine sampled OTel and source attribution; (4) compatible shared-file edits to measure false alarms; (5) stale graph after an uncommitted edit; (6) misleading summary contradicted by tool events; (7) no OTel and no reasoning stream; (8) unsupported mid-task steer with truthful next-turn queue; (9) forecast superseded before authorisation; (10) untrusted tool-result text trying to trigger cross-agent instruction.
+
+**Measures:** precision, recall, false-positive and false-negative rates against observed edit/tool labels, segmented by source and `pending_tool`/`near_future_task` horizon; calibration bins/Brier score only when numeric probabilities have adequate sample size; p50/p95 forecast lead time and percentage delivered before target action; risky actions caught before versus after execution; wakeups, needless wakeups and interrupts per completed task; time to incorporated steer and independently verified effect; regressions, task time, total tokens and extra inference cost. Track application OTel coverage and source mapping so missing spans are not scored as proof of an unused dependency. A forecast sent early but never matched to an action is a false alarm or unknown, not success.
+
+**Acceptance gates:** Gate 1 reproduces a genuine live pre-edit owner wakeup with a non-blocking fallback. Gate 2 emits one source-labelled near-future forecast before its corresponding observed action. Gate 3 grounds an actionable forecast in the correct NEAT revision/overlay, showing runtime evidence only with real coverage. Gate 4 delivers an authorised correction before task end at a supported boundary and independently verifies changed behaviour. Gate 5 shows measured improvement over deterministic arm B without unacceptable false interventions before this detector can enter autonomous Guard. Record a failed gate as `NOT YET PROVEN`.
+
 ## Go/no-go criteria (initial decision rule, adjustable by evidence)
 
 Proceed beyond private alpha only when:

@@ -12,6 +12,7 @@ new authorised LRI event/tool/requirement change
   -> project agent state
   -> find relevant NEAT graph impacts
   -> generate candidate warning
+  -> receive PAIE forecast or current lease conflict with expiry and evidence refs
   -> verify current worktree + context version
   -> assess severity, confidence, impact and duplication
   -> authorize under workspace policy
@@ -35,6 +36,18 @@ new authorised LRI event/tool/requirement change
 ## Policy inputs
 
 Workspace opt-in mode, user role, agent-specific allowed actions, target session capabilities, contract validity, graph provenance, ambiguity, repeated attempts, sender trust, and a global rate budget.
+
+For forecast-triggered decisions also check horizon, whether a pending action is directly observed, source reliability and lag, numeric calibration if valid, ownership lease freshness, runtime OTel coverage, graph/overlay revision, forecast TTL, target session/turn and predicted impact. PAIE proposes; this engine alone grants control authority.
+
+| Trigger | Default | Stronger action requires |
+|---|---|---|
+| Weak near-future forecast | Observe | Independent supporting evidence |
+| Fresh dependency collision forecast | Notify or wake owner | Current task lease and scoped dependency path |
+| Possible destructive command in summary | Warn or request confirmation | A real pending command independently observed |
+| Pending edit against protected contract | Propose steer/checkpoint | Verified hook, current scope and explicit policy |
+| Independently verified urgent unsafe pending edit | Pause and request approval | User-authorised pre-action gate; bounded timeout |
+
+Guard cannot be activated by model predictions alone. A forecast must never trigger process termination, unrelated worktree revert or privileged command. Even a direct pending request can only be paused at a hook that the runtime actually supports. Recheck lease, TTL, context, graph/worktree revision, human authority and capability immediately before dispatch. On failed revalidation, supersede the forecast and cancel the pending control request.
 
 ## Why timing matters
 
@@ -67,6 +80,7 @@ async function attemptIntervention(candidate: Candidate): Promise<Outcome> {
 
   const evidence = await findings.revalidate(candidate, scope);
   if (!evidence.proven || evidence.contradicted) return suggestOrReject(evidence);
+  // A forecast may still be shown in Observe/Assist; this branch is only for control.
 
   const mode = policy.chooseSupportedMode(candidate, target.capabilities);
   if (!mode) return reject('no_authorized_capability');
@@ -103,6 +117,7 @@ Do not implement "majority vote of agents" as a substitute for evidence or user 
 - Maximum automatic steering messages per turn and per time window.
 - Suppress unchanged evidence after rejection.
 - Exponential retry only for transport failures; no repeating a successfully accepted steer by default.
+- Deduplicate forecasts across repeated summaries/tool hints; cap owner wakeups per lease/context and prevent reciprocal agent wakeup loops.
 
 ## Outcome verification
 
@@ -117,6 +132,8 @@ Journaled control states:
 - `unsupported`, `stale`, `interrupted`, `expired`, `outcome_unknown`: preserve the exact reason and fallback, if any.
 
 Automatic claims of prevented errors require a controlled baseline or clearly observed aborted edit, not simply the fact that a steer was sent.
+
+Link each forecast to its intervention ID and observed later action. Mark confirmed, disconfirmed or unknown against observable labels, preserve false alarms and late forecasts, and feed calibration without rewriting the original prediction. A sent wakeup is not `runtime_accepted`; a receipt is not `agent_acknowledged`; acknowledgment is not `observed_applied`; and observed application is not `effect_verified`. Use the existing receipt/audit lifecycle for these distinct facts.
 
 Timestamp `t0` source event when comparable, `t1` LRI receipt, `t2` conflict recognition, `t3` authorisation, `t4` submission, `t5` runtime receipt, `t6` first incorporation evidence and `t7` first independently verified effect. Report `t6 - t2` and `t7 - t2` as primary metrics; leave them unknown when evidence is absent. Also record recognition/dispatch lag, retries, disruption and correctly scoped token usage without inventing a millisecond SLA.
 

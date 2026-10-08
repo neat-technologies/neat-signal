@@ -17,6 +17,8 @@ Build **NEAT Signal** as a first-party, optional NEAT component. From scratch, i
 - Never equate `runtime_accepted`, an agent's “OK”, `incorporated_by_agent`, and independently `effect_verified`.
 - Never silently substitute `queue_next_turn` for verified active-turn steering or count an after-task correction as the flagship use case.
 - Treat provider-exposed trace, provider summary, visible output, tool activity, usage counts and inferred intent as different signals. Counts contain no thought text; hidden private reasoning is inaccessible when the provider does not transmit it.
+- Never describe a forecast as the agent's hidden thought or an observed edit. A verified pending pre-tool request and a near-future probabilistic forecast are different horizons.
+- Application OTel traces describe instrumented application behaviour, not coding-agent thoughts, token text or file edits. Instrument agent runtimes and file/tool boundaries separately.
 
 ## Product invariants
 
@@ -34,6 +36,9 @@ Build **NEAT Signal** as a first-party, optional NEAT component. From scratch, i
 12. LRI text capture is explicit opt-in, permission-scoped, redacted and ephemeral by default; bulk deltas cannot starve the bounded fast control lane.
 13. The control path checks human priority, authority, TTL, idempotency, target turn, worktree/context revision and capability again at dispatch. Observe is default; managed pre-tool checkpoints require user permission and a verified hook.
 14. A native receipt is not proof of changed behaviour; independent later action/test evidence is required for `effect_verified`.
+15. PAIE is a separate proposed module that emits candidates through the existing `EventEnvelope` journal. Only the Intervention Engine authorises control; model predictions alone cannot enable Guard, block a tool or wake an owner without current policy and lease checks.
+16. Keep intent confidence, NEAT edge provenance/coverage and impact severity separate. `INFERRED`, `STALE`, `FRONTIER` or a stale worktree graph cannot alone justify high-risk control. Mark untested capability `UNVERIFIED`.
+17. Ownership leases are advisory, short-lived and scoped to a task/repository/worktree; human instructions always win. Do not claim a wakeup or correction worked until later observable evidence verifies it.
 
 ## Required first actions
 
@@ -42,14 +47,17 @@ Build **NEAT Signal** as a first-party, optional NEAT component. From scratch, i
 3. Inspect NEAT graph query APIs and node/provenance semantics; write a minimal typed NEAT bridge test.
 4. Inspect selected OpenAI, Claude and optional open-weight/generic runtime versions; record a capability matrix and probe authorised reasoning-summary/trace, visible output, tool/usage events, attachment, live steer, interrupt and resume. Mark every untested cell `UNVERIFIED` and state its fallback.
 5. Run the P0 **Live Thought-to-Steer** fixture: detect stale assumptions while a long task is active, attempt the strongest verified authorised strategy, and separately verify incorporation and changed action before task completion. Compare a next-turn-queue control; preserve failed results.
-6. Implement the smallest honest end-to-end workflow, starting in Observe mode, only after the audit/probe decisions.
+6. Probe pre-tool request/pause, owner wakeup/session resume, dirty-worktree graph overlay and source-attributed application OTel coverage before PAIE control claims. Run the Agent Intent Prediction Benchmark against a deterministic rules-only arm; preserve false alarms and negative results.
+7. Implement the smallest honest end-to-end workflow, starting in Observe mode, only after the audit/probe decisions.
 
 ## Engineering practices
 
 - New shared types: Zod schema + inferred TypeScript types + compatibility tests.
+- Add forecast, lease, expiry/supersession and outcome schemas to the existing envelope with migration/replay tests; do not create a competing bus.
 - Append-only audit and explicit migration strategy for persisted schema changes.
 - No source-file or secret-content logging by default.
 - Focus first on deterministic conflict detection, not language-model hallucinated plans.
+- Test a real pre-edit owner wakeup, an early forecast, a scoped NEAT join, a timely correction and incremental value over rules-only coordination before predictive-performance claims.
 - Disallow automatic high-risk or destructive actions.
 - Provider-adapter errors must be typed and surfaced to callers.
 - Use fixture worktrees for stale-branch and contract-change integration tests.
@@ -61,7 +69,7 @@ Build **NEAT Signal** as a first-party, optional NEAT component. From scratch, i
 
 ## Build order
 
-`Phase 0 NEAT audit + runtime capability probes + Live Thought-to-Steer research -> shared schemas -> session registry -> journal and LRI -> durable messaging + fast control lane -> first verified adapter -> NEAT graph bridge -> state mirror -> safe detector -> approved same-task steering -> independent outcome verification -> dashboard -> second provider -> benchmarks.`
+`Phase 0 NEAT audit + runtime/pre-tool capability probes + Live Thought-to-Steer research -> shared schemas -> session registry -> journal and LRI -> durable messaging + fast control lane -> first verified adapter -> NEAT bridge and worktree overlay -> state mirror and ownership leases -> deterministic conflict detector and owner wakeup -> PAIE near-future forecasting -> approved same-task steering -> independent outcome verification -> matched prediction benchmark -> dashboard/second provider -> evidence-gated Guard.`
 
 ## Completion reporting
 

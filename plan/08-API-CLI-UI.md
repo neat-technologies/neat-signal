@@ -18,6 +18,9 @@ neat signal conflicts                       # Evidence-backed current conflicts
 neat signal events --follow                  # Tail authorized/redacted event stream
 neat signal replay --session sess_42         # Reconstruct execution timeline
 neat signal mode observe|assist|guard        # Requires explicit user permission
+neat signal forecasts [--session sess_42]    # Predictions, horizon, expiry and evidence
+neat signal leases [--task task_1]            # Advisory owner scopes and expiry
+neat signal wake --lease lease_1 ...          # Policy-checked owner notification
 ```
 
 Commands should support `--json` and stable nonzero error codes for unsupported runtime capability, unauthorized action, stale target, unreachable daemon and invalid scope.
@@ -38,6 +41,11 @@ Commands should support `--json` and stable nonzero error codes for unsupported 
 | `POST` | `/signal/v1/messages` | Persist routed message and return immutable ID |
 | `GET` | `/signal/v1/messages/:id` | Delivery lifecycle and evidence |
 | `GET` | `/signal/v1/findings` | Conflict/relevance findings |
+| `GET` | `/signal/v1/forecasts` | Current and historical source-labelled forecasts |
+| `GET` | `/signal/v1/forecasts/:id` | Evidence, freshness, outcome and linked intervention |
+| `GET` | `/signal/v1/ownership/leases` | Scoped advisory task ownership |
+| `POST` | `/signal/v1/ownership/leases` | Register/renew an authorised short lease |
+| `POST` | `/signal/v1/ownership/leases/:id/release` | Release a lease |
 | `POST` | `/signal/v1/interventions` | Create intervention request (authorisation required) |
 | `POST` | `/signal/v1/interventions/:id/approve` | Human approval |
 | `GET` | `/signal/v1/interventions/:id` | Decision, delivery and verification |
@@ -53,6 +61,8 @@ All write routes accept `Idempotency-Key` and authenticated identities. Mutation
 
 Three columns: live agents (task, session, last event, tokens if measurable), conflicts/warnings (severity, affected dependency, provenance), and intervention queue (action, preconditions, authorisation). Show *unknown* when metrics are absent; never equate idle with disconnected. A per-session badge distinguishes verified native steer, interrupt-and-continue, managed checkpoint, queue-only and observe-only from unverified capabilities.
 
+A forecast card shows `observed pending request` or `predicted near-future action`, target paths/contracts, exact source types, evidence quality, graph/worktree revision, expiry and lead time when later measurable. Do not present a predicted edit as a completed change or an intent probability when calibration is unavailable. Owner wakeups display lease, reason, target session and fallback if the owner cannot resume.
+
 ### Page: Agent detail
 
 Timeline of tool events, changed files, summaries when available, prompts/messages where user opted in, token usage, active turn and terminal controls. Label each stream item `provider-exposed trace`, `provider summary`, `visible output`, `tool event`, `usage count` or `inferred intent`; show source, freshness and stream gaps. Expose reasoning text only with explicit opt-in and proof the provider emitted it. Token counts never render as text content.
@@ -61,9 +71,13 @@ Timeline of tool events, changed files, summaries when available, prompts/messag
 
 NEAT graph path from changed API/file to recipient agent's active file; show worktree scope, graph revision, edge provenance and confidence. UI distinguishes `EXTRACTED`, `OBSERVED`, `INFERRED` and `STALE`.
 
+Show `FRONTIER` as unsettled. Separate static path, worktree overlay status and application OTel evidence with environment, sampling/coverage and source-attribution labels. A missing span reads “runtime evidence unavailable/none observed in covered traffic,” never “unused.” Show forecast intent confidence, dependency provenance and impact severity separately.
+
 ### Page: Replay and audit
 
 Reconstruct exactly which evidence caused the intervention, what was sent, who authorised it, provider receipt, same-task incorporation evidence, independently verified effect, and `t0`–`t7` timestamps where known. Show median/p95 detection-to-incorporation and detection-to-effect only for measured samples, with unknowns and interrupted work reported separately.
+
+For PAIE, include forecast creation/expiry/supersession, a later observable action label, whether the forecast arrived before that action, owner wakeup disposition, and whether a correction changed the outcome. Show `runtime_accepted`, `agent_acknowledged`, `observed_applied` and `effect_verified` as separate states.
 
 ## User-level experience
 

@@ -14,6 +14,7 @@ This is essential infrastructure for a system where one AI agent can influence a
 - Circular instructions cause repeated token spend or destructive edits.
 - A high-volume reasoning/output stream starves the urgent control lane or leaks sensitive text through replay, logs or an inferred digest.
 - A forged “thinking” or tool-intent delta attempts to become an authoritative instruction or a false checkpoint.
+- A speculative intent forecast or stale lease is used to wake, pause or steer another session without current authority.
 
 ## Mandatory controls
 
@@ -27,6 +28,8 @@ This is essential infrastructure for a system where one AI agent can influence a
 6. Capture the human's explicit consent before Guard mode or sending external agent instructions.
 7. Treat LRI subscriptions as a separate grant: observation of metadata does not authorise reasoning/output text. Bind grants to workspace, session, content class and expiry; revoke them when the session or user changes.
 8. Provide an operator kill switch that immediately disables automatic dispatch and content capture, invalidates outstanding control requests where possible, and records the decision. It cannot retroactively undo already-launched tools or edits.
+9. Obtain separate consent for reasoning-assisted/model inference, including which summary/output classes may be processed, their retention and token budget. A lease grants advisory routing context, not permission to read private content or override a human instruction.
+10. Owner wakeup requires an authenticated current lease, scoped task relevance, a live or explicitly resumable session, rate budget and current user policy. Offline or unsupported owners get a truthful bounded fallback; do not keep agents running solely to watch for collisions.
 
 ### Data protection
 
@@ -40,6 +43,7 @@ This is essential infrastructure for a system where one AI agent can influence a
 - Full authorised visible-stream capture is time-bounded and off by default. Prefer redacted, ephemeral in-memory projections; persist only minimum timing/source/gap metadata and aggregates unless a separate scoped retention grant exists.
 - Redact before subscription fan-out as well as durable write. Rate-limit and bound text deltas, record dropped counts, and prevent control-channel starvation. Derived intent digests inherit source sensitivity and deletion rules.
 - Do not capture or forward provider-exposed reasoning where provider terms, runtime configuration or user permission forbid it; encrypted/opaque reasoning state remains inaccessible.
+- Forecast rationale stores only a redacted evidence digest and immutable event references. Derived predictions inherit the most restrictive input sensitivity, expiry and deletion rules. Do not retain raw traces as a convenient predictor training set without explicit consent.
 
 ### Injection prevention
 
@@ -49,6 +53,7 @@ This is essential infrastructure for a system where one AI agent can influence a
 - Provide clear record of source agent, source artifacts, evidence and required authority.
 - Reasoning traces, summaries, output, tool-intent events and inferred digests are untrusted evidence. They may help identify a risk but cannot by themselves grant authority, override a human instruction or prove a future action.
 - A pre-tool checkpoint is only for Signal-managed agents with a verified safe hook and explicit user permission; independently owned sessions cannot be paused by assumption.
+- Model-inferred intent, agent plans, summaries, tool results and repository text cannot issue cross-agent instructions. The Intervention Engine evaluates them as data, independently verifies pending actions and authenticates the human/lease authority before any wakeup or control request.
 
 ### Reliability
 
@@ -83,3 +88,7 @@ Security-relevant records: who requested, who/what authorized, which target and 
 - [ ] Prompt injection inside a provider-exposed trace or tool result cannot promote itself into a higher-priority steer.
 - [ ] Stream flood and gap tests preserve control-lane responsiveness and report dropped counts.
 - [ ] Kill switch prevents later automatic dispatch; already-running tools remain visible and are not falsely reported cancelled.
+- [ ] A stale/superseded forecast cannot be replayed after reconnect to trigger a wakeup or steer.
+- [ ] Model inference opt-out prevents content processing and removes derived ephemeral state; retention grants are enforced.
+- [ ] A forged lease, untrusted tool result or prompt-injected summary cannot upgrade a forecast into a checkpoint.
+- [ ] Wakeup quotas, offline fallback and reciprocal-wakeup suppression work across concurrent agents.

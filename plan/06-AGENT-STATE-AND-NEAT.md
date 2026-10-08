@@ -16,12 +16,15 @@ Node types:
 - `FileActivity`: observed file read/change or reported intent.
 - `Message`: instruction and delivery lifecycle.
 - `Intervention`: hypothesis, decision, action, evidence and outcome.
+- `IntentForecast`: source-labelled next observable action, horizon, expiry and outcome.
+- `TaskOwnershipLease`: advisory task/resource claim with expiry and scope.
 
 Edge types:
 
 - `AGENT_RUNNING_SESSION`, `SESSION_EXECUTES_TURN`, `TURN_WORKS_ON_TASK`.
 - `TURN_READS_FILE`, `TURN_EDITS_FILE`, `TASK_DEPENDS_ON_TASK`.
 - `MESSAGE_TARGETS_TURN`, `INTERVENTION_CITES_EVENT`.
+- `FORECAST_CITES_EVENT`, `FORECAST_AFFECTS_LEASE`, `FORECAST_LINKS_INTERVENTION`.
 - `FILE_REFERS_TO_NEAT_NODE` (always has repo/worktree/commit scope).
 
 Agent reasoning summaries or plans are **attributes/evidence** of a turn, not authoritative graph dependencies.
@@ -41,6 +44,26 @@ repo_scope, stale_after, contradictions[]
 `observation_kind` includes `direct_tool_event`, `file_hash_verified`, `provider_reported`, `agent_self_report`, `model_inference`, `neat_extracted`, `neat_observed`, `neat_inferred`. Do not mislabel a reported intention as executed behaviour.
 
 Add `provider_reasoning_trace`, `provider_reasoning_summary`, `assistant_output_delta`, `tool_intent` and `stream_gap` as distinct observation kinds. A content projection is ephemeral by default; the durable journal keeps source IDs, timing, redacted digests and capability/quality metadata unless the user opts into time-bounded content retention. A trace expressly supplied by a provider is still not proof of inaccessible internal computation.
+
+### PAIE evidence hierarchy and horizons
+
+| Input | Permitted claim | Limit |
+|---|---|---|
+| Verified pre-tool request | Agent is about to request a named edit/command at a supported boundary | It has not necessarily executed or committed |
+| Verified file hash/parsed diff | A scoped worktree changed | Correctness is unproven |
+| Provider summary/trace or declared plan | Reported or exposed direction, labelled by source | Does not make the next action certain |
+| Model-generated estimate | `near_future_task` forecast | Cannot grant control authority |
+| NEAT `EXTRACTED` | Source relation at an identified graph revision | No runtime execution proof |
+| NEAT `OBSERVED` | Instrumented application interaction at a time/environment | No completeness or current-branch guarantee |
+| NEAT `INFERRED`/`STALE`/`FRONTIER` | Hypothesis, aged or unsettled lead | Insufficient alone for high-risk blocking |
+
+PAIE uses two horizons: `pending_tool` only with directly observed request evidence, and `near_future_task` for uncertain earlier forecasts. Store source IDs, event lag, graph revision, worktree overlay, context version, expiry, contradictions and separate intent calibration, dependency evidence strength and impact severity. Missing OTel is **unavailable**, not proof of no dependency. Missing `code.*` attribution leaves a span without file identity. Source-attributed OTel application spans describe the application, never an agent's thoughts or edits.
+
+### Ownership and semantic relevance
+
+Task Ownership Leases may cover files, symbols, contracts or dependency subgraphs. They are scoped to task/repo/worktree and lapse on expiry, task end or revocation. Same-file overlap is only a candidate conflict. For example, A may own the `auth.ts`/`session.ts`/`middleware.ts`/`token.ts` task while B requests a `session.ts` edit; confirm the lease and incompatibility before waking A. If A owns an API contract and B edits a consumer in another worktree, a fresh dependency path may reveal a semantic collision without a common file. Keep lease conflict, graph-inferred impact and model-predicted collision as different event classes. Low risk annotates state, medium risk wakes A once with a digest, and a high-risk checkpoint requires a verified pending action and Intervention Engine approval. Offline owners receive a bounded warning/human fallback.
+
+Candidate grounding resolves path/symbol IDs against the exact static snapshot plus a validated worktree overlay, then joins source-attributed runtime evidence only for the matching environment and coverage window. If overlay creation fails or graph revision lags the dirty worktree, lower evidence quality and require human review. Do not combine heterogeneous evidence values into a fabricated 0–1 probability.
 
 ## How to detect a cross-agent conflict
 
