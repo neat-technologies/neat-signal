@@ -1,0 +1,25 @@
+{
+  "arm": "treatment",
+  "model": "claude-sonnet-5-5",
+  "t0": 0.0,
+  "t_inject_rel": 7.19,
+  "t_incorp_rel": 9.11,
+  "task_end_rel": 17.5,
+  "steer_latency_s": 1.93,
+  "contract_fetches": 3,
+  "runtime_accepted": true,
+  "incorporated_by_agent": true,
+  "effect_verified": true,
+  "edits_total": 6,
+  "edits_session_after_inject": 5,
+  "tokens": 136762,
+  "cost_usd": 0.1063358,
+  "verify": {
+    "arm": "treatment",
+    "model": "claude-sonnet-5-5",
+    "svc_calls": "3",
+    "client_token_id": "0",
+    "client_session_id": "5",
+    "tsc_rc": "0"
+  }
+}

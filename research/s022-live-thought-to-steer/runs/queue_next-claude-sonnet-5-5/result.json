@@ -1,0 +1,25 @@
+{
+  "arm": "queue_next",
+  "model": "claude-sonnet-5-5",
+  "t0": 0.0,
+  "t_inject_rel": null,
+  "t_incorp_rel": null,
+  "task_end_rel": 11.54,
+  "steer_latency_s": null,
+  "contract_fetches": 2,
+  "runtime_accepted": false,
+  "incorporated_by_agent": false,
+  "effect_verified": false,
+  "edits_total": 1,
+  "edits_session_after_inject": 0,
+  "tokens": 78112,
+  "cost_usd": 0.0857332,
+  "verify": {
+    "arm": "queue_next",
+    "model": "claude-sonnet-5-5",
+    "svc_calls": "2",
+    "client_token_id": "5",
+    "client_session_id": "0",
+    "tsc_rc": "2"
+  }
+}

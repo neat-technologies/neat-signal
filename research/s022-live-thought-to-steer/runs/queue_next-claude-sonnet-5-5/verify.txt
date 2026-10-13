@@ -1,0 +1,2 @@
+arm=queue_next model=claude-sonnet-5-5 svc_calls=2 client_token_id=5 client_session_id=0
+0 tsc_rc=2
