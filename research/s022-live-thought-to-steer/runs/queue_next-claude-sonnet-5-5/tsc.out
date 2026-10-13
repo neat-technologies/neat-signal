@@ -1,0 +1,5 @@
+client/auth.ts(19,17): error TS2339: Property 'token_id' does not exist on type 'AuthResponse'.
+client/auth.ts(31,17): error TS2339: Property 'token_id' does not exist on type 'AuthResponse'.
+client/auth.ts(48,62): error TS2339: Property 'token_id' does not exist on type 'AuthResponse'.
+client/auth.ts(52,26): error TS2339: Property 'token_id' does not exist on type 'AuthResponse'.
+client/auth.ts(61,52): error TS2339: Property 'token_id' does not exist on type 'AuthResponse'.

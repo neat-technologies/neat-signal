@@ -1,0 +1,2 @@
+arm=treatment model=claude-opus-5-5 svc_calls=3 client_token_id=0
+0 client_session_id=6 tsc_rc=0

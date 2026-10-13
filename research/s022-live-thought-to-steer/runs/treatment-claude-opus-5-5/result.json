@@ -1,0 +1,25 @@
+{
+  "arm": "treatment",
+  "model": "claude-opus-5-5",
+  "t0": 0.0,
+  "t_inject_rel": 15.95,
+  "t_incorp_rel": 20.47,
+  "task_end_rel": 28.13,
+  "steer_latency_s": 4.52,
+  "contract_fetches": 3,
+  "runtime_accepted": true,
+  "incorporated_by_agent": true,
+  "effect_verified": true,
+  "edits_total": 2,
+  "edits_session_after_inject": 1,
+  "tokens": 187497,
+  "cost_usd": 0.22309060000000003,
+  "verify": {
+    "arm": "treatment",
+    "model": "claude-opus-5-5",
+    "svc_calls": "3",
+    "client_token_id": "0",
+    "client_session_id": "6",
+    "tsc_rc": "0"
+  }
+}
